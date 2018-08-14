@@ -10,16 +10,28 @@ describe Oystercard do
     expect(subject.balance).to eq(0)
   end
 
-  it "responds to #top_up" do
-    expect(subject).to respond_to(:top_up).with(1).argument
+  describe "#top_up" do
+    it "responds to #top_up" do
+      expect(subject).to respond_to(:top_up).with(1).argument
+    end
+
+    it "adds amount to #balance" do
+      card = Oystercard.new
+      amount = 20
+      card.top_up(amount)
+      expect(card.balance).to eq(amount)
+    end
+
+    context "amount exceeds limit" do
+      before(:context) do
+        @card = Oystercard.new
+        @card.top_up(90)
+      end
+
+      it "raises an error" do
+        expect{ @card.top_up(1) }.to
+        raise_error("Limit of £#{Oystercard::MAX_BALANCE} exceeded")
+      end
+    end
   end
-
-  it "adds amount to #balance" do
-    card = Oystercard.new
-    amount = 20
-    card.top_up(amount)
-    expect(card.balance).to eq(amount)
-  end
-
-
 end
