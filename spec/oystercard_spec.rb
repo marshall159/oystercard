@@ -35,7 +35,6 @@ describe Oystercard do
   end
 
   describe "#deduct" do
-
     before(:context) do
       @card = Oystercard.new
       @card.top_up(10)
@@ -43,6 +42,22 @@ describe Oystercard do
 
     it "reduces balance by amount" do
       expect { @card.deduct(5) }.to change { @card.balance }.from(10).to(5)
+    end
+  end
+
+  describe "touch_in and touch_out" do
+    it "#in_journey? returns status" do
+      expect(subject).not_to be_in_journey
+      expect(subject.in_journey?).to be(false)
+    end
+
+    it "#touch_in changes status of #in_journey?" do
+      expect { subject.touch_in }.to change { subject.in_journey? }.from(false).to(true)
+    end
+
+    it "#touch_out changes status of #in_journey?" do
+      subject.touch_in
+      expect { subject.touch_out }.to change { subject.in_journey? }.from(true).to(false)
     end
   end
 
