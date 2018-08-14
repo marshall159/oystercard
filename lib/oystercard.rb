@@ -8,5 +8,4 @@ class Oystercard
   def top_up(amount)
     self.balance += amount
   end
-
 end
