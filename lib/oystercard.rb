@@ -15,4 +15,8 @@ class Oystercard
     amount + balance > MAX_BALANCE
   end
 
+  def deduct(amount)
+    self.balance -= amount
+  end
+
 end

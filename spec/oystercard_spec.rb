@@ -29,9 +29,21 @@ describe Oystercard do
       end
 
       it "raises an error" do
-        expect{ @card.top_up(1) }.to
-        raise_error("Limit of £#{Oystercard::MAX_BALANCE} exceeded")
+        expect{ @card.top_up(1) }.to raise_error("Limit of £#{Oystercard::MAX_BALANCE} exceeded")
       end
     end
   end
+
+  describe "#deduct" do
+
+    before(:context) do
+      @card = Oystercard.new
+      @card.top_up(10)
+    end
+
+    it "reduces balance by amount" do
+      expect { @card.deduct(5) }.to change { @card.balance }.from(10).to(5)
+    end
+  end
+
 end
