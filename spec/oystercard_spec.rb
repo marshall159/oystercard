@@ -34,31 +34,37 @@ describe Oystercard do
     end
   end
 
-  describe "#deduct" do
-    before(:context) do
+
+  context "minimum balance required" do
+    it "raises an error" do
+      expect{ subject.touch_in }.to raise_error("Minimum balance £#{Oystercard::MIN_BALANCE} required")
+    end
+  end
+
+  context "top_up before journey" do
+    before(:example) do
       @card = Oystercard.new
-      @card.top_up(10)
+      @card.top_up(3)
+    end
+    describe "touch_in and touch_out" do
+      it "#in_journey? returns status" do
+        expect(subject).not_to be_in_journey
+        expect(subject.in_journey?).to be(false)
+      end
+
+      it "#touch_in changes status of #in_journey?" do
+        expect { @card.touch_in }.to change { @card.in_journey? }.from(false).to(true)
+      end
+
+      it "#touch_out changes status of #in_journey?" do
+        @card.touch_in
+        expect { @card.touch_out }.to change { @card.in_journey? }.from(true).to(false)
+      end
+
+      it "#touch_out reduces balance by minimum fare" do
+        expect { @card.touch_out }.to change { @card.balance}.by(-Oystercard::MIN_FARE)
+      end
     end
 
-    it "reduces balance by amount" do
-      expect { @card.deduct(5) }.to change { @card.balance }.from(10).to(5)
-    end
   end
-
-  describe "touch_in and touch_out" do
-    it "#in_journey? returns status" do
-      expect(subject).not_to be_in_journey
-      expect(subject.in_journey?).to be(false)
-    end
-
-    it "#touch_in changes status of #in_journey?" do
-      expect { subject.touch_in }.to change { subject.in_journey? }.from(false).to(true)
-    end
-
-    it "#touch_out changes status of #in_journey?" do
-      subject.touch_in
-      expect { subject.touch_out }.to change { subject.in_journey? }.from(true).to(false)
-    end
-  end
-
 end
