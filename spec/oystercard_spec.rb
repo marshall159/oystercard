@@ -45,15 +45,10 @@ describe Oystercard do
     before(:example) do
       @card = Oystercard.new
       @card.top_up(3)
-
-      # let(:mock_entry_station) { double(:en) }
-      @entry_station = "Ealing Broadway"
-      @exit_station = "Aldgate East"
-      # @entry_station = double(:ealing)
-      # allow(@entry_station).to receive
-      # (:ealing, "Ealing Broadway")
-      # @exit_station = double(:aldgate, "Aldgate East")
+      @entry_station = double(:ealing)
+      @exit_station = double(:aldgate)
     end
+
     describe "touch_in and touch_out" do
       it "#in_journey? returns status" do
         expect(subject).not_to be_in_journey
@@ -76,13 +71,15 @@ describe Oystercard do
 
     describe "#history" do
       it "returns an empty journey history for the oysterard if there are no trips" do
-        expect(@card.history).to eq([])
+        expect(@card.history).to be_empty
       end
+
+      let(:journey) { {entry_station: @entry_station, exit_station: @exit_station} }
 
       it "returns a journey history" do
         @card.touch_in(@entry_station)
         @card.touch_out(@exit_station)
-        expect(@card.history).to eq([{entry_station: "Ealing Broadway", exit_station: "Aldgate East"}])
+        expect(@card.history).to include(journey)
       end
     end
 
