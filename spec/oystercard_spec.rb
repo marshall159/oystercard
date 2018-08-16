@@ -45,7 +45,14 @@ describe Oystercard do
     before(:example) do
       @card = Oystercard.new
       @card.top_up(3)
-      @station = double("Ealing Broadway")
+
+      # let(:mock_entry_station) { double(:en) }
+      @entry_station = "Ealing Broadway"
+      @exit_station = "Aldgate East"
+      # @entry_station = double(:ealing)
+      # allow(@entry_station).to receive
+      # (:ealing, "Ealing Broadway")
+      # @exit_station = double(:aldgate, "Aldgate East")
     end
     describe "touch_in and touch_out" do
       it "#in_journey? returns status" do
@@ -54,27 +61,28 @@ describe Oystercard do
       end
 
       it "#touch_in changes status of #in_journey?" do
-        expect { @card.touch_in(@station) }.to change { @card.in_journey? }.from(false).to(true)
+        expect { @card.touch_in(@entry_station) }.to change { @card.in_journey? }.from(false).to(true)
       end
 
       it "#touch_out changes status of #in_journey?" do
-        @card.touch_in(@station)
-        expect { @card.touch_out }.to change { @card.in_journey? }.from(true).to(false)
+        @card.touch_in(@entry_station)
+        expect { @card.touch_out(@exit_station) }.to change { @card.in_journey? }.from(true).to(false)
       end
 
       it "#touch_out reduces balance by minimum fare" do
-        expect { @card.touch_out }.to change { @card.balance}.by(-Oystercard::MIN_FARE)
+        expect { @card.touch_out(@exit_station) }.to change { @card.balance}.by(-Oystercard::MIN_FARE)
+      end
+    end
+
+    describe "#history" do
+      it "returns an empty journey history for the oysterard if there are no trips" do
+        expect(@card.history).to eq([])
       end
 
-      it "#touch_out updates entry_station" do
-        @card.touch_in(@station)
-        @card.touch_out
-        expect(@card.entry_station).to be(nil)
-      end
-
-      it "#touch_in remembers entry station" do
-        @card.touch_in(@station)
-        expect(@card.entry_station).to eq(@station)
+      it "returns a journey history" do
+        @card.touch_in(@entry_station)
+        @card.touch_out(@exit_station)
+        expect(@card.history).to eq([{entry_station: "Ealing Broadway", exit_station: "Aldgate East"}])
       end
     end
 
