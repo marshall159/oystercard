@@ -1,6 +1,6 @@
 class Oystercard
   attr_reader :history, :balance
-  
+
   MAX_BALANCE = 90
   MIN_BALANCE = 2
   MIN_FARE = 2
