@@ -26,6 +26,7 @@ describe Oystercard do
       before(:context) do
         @card = Oystercard.new
         @card.top_up(90)
+        @station = "Ealing"
       end
 
       it "raises an error" do
@@ -34,10 +35,9 @@ describe Oystercard do
     end
   end
 
-
   context "minimum balance required" do
     it "raises an error" do
-      expect{ subject.touch_in }.to raise_error("Minimum balance £#{Oystercard::MIN_BALANCE} required")
+      expect{ subject.touch_in(@station) }.to raise_error("Minimum balance £#{Oystercard::MIN_BALANCE} required")
     end
   end
 
@@ -45,6 +45,7 @@ describe Oystercard do
     before(:example) do
       @card = Oystercard.new
       @card.top_up(3)
+      @station = double("Ealing Broadway")
     end
     describe "touch_in and touch_out" do
       it "#in_journey? returns status" do
@@ -53,16 +54,27 @@ describe Oystercard do
       end
 
       it "#touch_in changes status of #in_journey?" do
-        expect { @card.touch_in }.to change { @card.in_journey? }.from(false).to(true)
+        expect { @card.touch_in(@station) }.to change { @card.in_journey? }.from(false).to(true)
       end
 
       it "#touch_out changes status of #in_journey?" do
-        @card.touch_in
+        @card.touch_in(@station)
         expect { @card.touch_out }.to change { @card.in_journey? }.from(true).to(false)
       end
 
       it "#touch_out reduces balance by minimum fare" do
         expect { @card.touch_out }.to change { @card.balance}.by(-Oystercard::MIN_FARE)
+      end
+
+      it "#touch_out updates entry_station" do
+        @card.touch_in(@station)
+        @card.touch_out
+        expect(@card.entry_station).to be(nil)
+      end
+
+      it "#touch_in remembers entry station" do
+        @card.touch_in(@station)
+        expect(@card.entry_station).to eq(@station)
       end
     end
 
